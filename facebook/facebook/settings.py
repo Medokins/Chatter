@@ -17,7 +17,10 @@ NEWSPIDER_MODULE = 'facebook.spiders'
 #USER_AGENT = 'facebook (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
+FEED_EXPORT_ENCODING = 'utf-8'
+DUPEFILTER_DEBUG = True
+LOG_LEVEL = 'INFO'
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32

@@ -10,10 +10,10 @@ def load_all_messages(path):
     df = pd.json_normalize(data['messages'])
     
     for i in np.arange(2,6) : 
-        file = open(path + 'message_'+str(i)+'.json', encoding='utf8')
+        file = open(os.path.join(path, 'message_', i, '.json'), encoding='utf8')
         data = json.load(file, object_hook=parse_obj)
         df_temp = pd.json_normalize(data['messages'])
-        df=df.append(df_temp)
+        df = df.append(df_temp)
     return (df)
     
 def parse_obj(obj):

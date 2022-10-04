@@ -1,6 +1,7 @@
 import pyaudio
 import wave
 import os
+import speech_recognition as sr
 
 def record_data(length):
     CHUNK = 1024
@@ -33,3 +34,12 @@ def record_data(length):
     wf.setframerate(RATE)
     wf.writeframes(b''.join(frames))
     wf.close()
+
+def convert_to_text():
+    path = os.path.join("voice_samples", "sample.wav")
+    r = sr.Recognizer()
+
+    with sr.AudioFile(path) as source:
+        audio_data = r.record(source)
+        text = r.recognize_google(audio_data)
+    return text

@@ -3,7 +3,7 @@ import wave
 import os
 import speech_recognition as sr
 
-def record_data(length):
+def record_data(length) -> None:
     CHUNK = 1024
     FORMAT = pyaudio.paInt16
     CHANNELS = 1
@@ -35,7 +35,7 @@ def record_data(length):
     wf.writeframes(b''.join(frames))
     wf.close()
 
-def convert_to_text():
+def convert_to_text() -> str:
     path = os.path.join("voice_samples", "sample.wav")
     r = sr.Recognizer()
 

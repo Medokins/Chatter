@@ -1,0 +1,13 @@
+{"intents": [
+    {"tag": "greeting",
+     "patterns": [],
+     "responses": [],
+     "context_set": ""
+    },
+    {"tag": "goodbye",
+    "patterns": [],
+    "responses": [],
+    "context_set": ""
+   }
+]
+}

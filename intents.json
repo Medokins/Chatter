@@ -1,13 +1,73 @@
 {"intents": [
-    {"tag": "greeting",
+    {"tag": "Greet",
      "patterns": [],
      "responses": [],
      "context_set": ""
     },
-    {"tag": "goodbye",
+    {"tag": "Bye",
     "patterns": [],
     "responses": [],
     "context_set": ""
-   }
+    },
+    {"tag": "Clarify",
+    "patterns": [],
+    "responses": [],
+    "context_set": ""
+    },
+    {"tag": "Continuer",
+    "patterns": [],
+    "responses": [],
+    "context_set": ""
+    },
+    {"tag": "Emotion",
+    "patterns": [],
+    "responses": [],
+    "context_set": ""
+    },
+    {"tag": "Emphasis",
+    "patterns": [],
+    "responses": [],
+    "context_set": ""
+    },
+    {"tag": "Reject",
+    "patterns": [],
+    "responses": [],
+    "context_set": ""
+    },
+    {"tag": "Statement",
+    "patterns": [],
+    "responses": [],
+    "context_set": ""
+    },
+    {"tag": "System",
+    "patterns": [],
+    "responses": [],
+    "context_set": ""
+    },
+    {"tag": "nAnswer",
+    "patterns": [],
+    "responses": [],
+    "context_set": ""
+    },
+    {"tag": "yAnswer",
+    "patterns": [],
+    "responses": [],
+    "context_set": ""
+    },
+    {"tag": "whQuestion",
+    "patterns": [],
+    "responses": [],
+    "context_set": ""
+    },
+    {"tag": "ynQuestion",
+    "patterns": [],
+    "responses": [],
+    "context_set": ""
+    },
+    {"tag": "Other",
+    "patterns": [],
+    "responses": [],
+    "context_set": ""
+    }
 ]
 }

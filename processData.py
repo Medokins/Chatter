@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import json
 import os
+from googletrans import Translator, constants
 
 def load_all_messages(path):
     file = open(path)
@@ -24,3 +25,8 @@ def parse_obj(obj):
             obj[key] = list(map(lambda x: x if type(x) != str else x.encode('latin_1').decode('utf-8'), obj[key]))
         pass
     return obj
+
+def translate_data(data, lang):
+    translator = Translator()
+    translation = translator.translate(data, src=lang)
+    print(f"{data} ({lang}) --> {translation.text} ({translation.dest})")

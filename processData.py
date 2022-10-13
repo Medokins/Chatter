@@ -2,20 +2,22 @@ import pandas as pd
 import numpy as np
 import json
 import os
-from googletrans import Translator, constants
+from googletrans import Translator
 
 def load_all_messages(path):
-    file = open(path)
-    
+    file = open(os.path.join(path, "message_1.json"))
     data = json.load(file, object_hook=parse_obj)
     df = pd.json_normalize(data['messages'])
-    
-    for i in np.arange(2,6) : 
-        file = open(os.path.join(path, 'message_', i, '.json'), encoding='utf8')
-        data = json.load(file, object_hook=parse_obj)
-        df_temp = pd.json_normalize(data['messages'])
-        df = df.append(df_temp)
-    return (df)
+
+    if len(os.listdir("messages")) > 1:
+        for i in np.arange(2, len(os.listdir("messages")) + 1) : 
+            file = open(os.path.join(path, f"message_{i}.json"), encoding='utf8')
+            data = json.load(file, object_hook=parse_obj)
+            df_temp = pd.json_normalize(data['messages'])
+            df = df.append(df_temp)
+        return df
+    else:
+        return df
     
 def parse_obj(obj):
     for key in obj:
@@ -30,3 +32,5 @@ def translate_data(data, lang):
     translator = Translator()
     translation = translator.translate(data, src=lang)
     print(f"{data} ({lang}) --> {translation.text} ({translation.dest})")
+
+print(load_all_messages("messages"))

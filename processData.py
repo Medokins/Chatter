@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import re
 import json
 import os
 from googletrans import Translator
@@ -13,16 +14,30 @@ def load_all_messages():
         df_temp = pd.json_normalize(data["messages"])
         df = df.append(df_temp)
 
-    findal_df = df[["timestamp_ms", "sender_name", "content"]]
-    names = findal_df["sender_name"].unique()
-    dict_map = {names[0] : 0, names[1] : 1}
-    findal_df = findal_df.rename(columns={"sender_name": "sender_id"})
-    findal_df["sender_id"] = findal_df["sender_id"].map(dict_map)
-    findal_df = findal_df.set_index(keys="timestamp_ms", drop=True)
-    findal_df = findal_df.sort_index()
+    final_df = df[["timestamp_ms", "sender_name", "content"]]
+    final_df = final_df.dropna()
 
-    return findal_df
-    
+    # set timestamp_ms as index
+    final_df = final_df.set_index(keys="timestamp_ms", drop=True)
+    final_df = final_df.sort_index()
+
+    # change to bool to be faster/lighter
+    names = final_df["sender_name"].unique()
+    dict_map = {names[0] : 0, names[1] : 1}
+    final_df = final_df.rename(columns={"sender_name": "is_sender"})
+    final_df["is_sender"] = final_df["is_sender"].map(dict_map).astype(np.bool)
+
+    # change to string to be faster/lighter
+    final_df["content"] = final_df["content"].astype("string")
+
+    # remove links
+    final_df["content"] = final_df["content"].apply(lambda x: re.split('https:\/\/.*', str(x))[0])
+    final_df["content"] = final_df["content"].replace('', np.NaN)
+    final_df = final_df.dropna()
+
+    return final_df
+
+# to correct Facebook's wrong encoding of foreign letters.  
 def parse_obj(obj):
     for key in obj:
         if isinstance(obj[key], str):
@@ -37,4 +52,5 @@ def translate_data(data, lang):
     translation = translator.translate(data, src=lang)
     print(f"{data} ({lang}) --> {translation.text} ({translation.dest})")
 
-print(load_all_messages())
+df = load_all_messages()
+print(df)

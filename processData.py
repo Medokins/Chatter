@@ -47,10 +47,22 @@ def parse_obj(obj):
         pass
     return obj
 
-def translate_data(data, lang):
+def translate_data(data, source_lang):
     translator = Translator()
-    translation = translator.translate(data, src=lang)
-    print(f"{data} ({lang}) --> {translation.text} ({translation.dest})")
+    data["content"] = data["content"].apply(lambda message: translator.translate(message, src=source_lang).text)    
+    return data
 
-df = load_all_messages()
-print(df)
+# just for easier testing
+def print_conversation(data):
+    section_flag = data.iloc[0]["is_sender"]
+    for i in range(len(data) - 1):
+        if section_flag != data.iloc[i]["is_sender"]:
+            section_flag = data.iloc[i]["is_sender"]
+            print("")
+        if data.index[i+1] - data.index[i] > 360000 * 7:
+            print(15 * "*", " Another conversation ", 15 * "*")
+
+        print(data.iloc[i]["content"])
+
+data = translate_data(load_all_messages().head(300), "pl")
+print_conversation(data)

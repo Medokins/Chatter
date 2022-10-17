@@ -5,7 +5,7 @@ import json
 import os
 from googletrans import Translator
 
-def load_all_messages():
+def load_all_messages() -> pd.DataFrame:
     df = pd.DataFrame()
 
     for i in np.arange(1, len(os.listdir("messages")) + 1) : 
@@ -47,9 +47,18 @@ def parse_obj(obj):
         pass
     return obj
 
-def translate_data(data, source_lang):
+def translate_data(data: pd.DataFrame, source_lang: str) -> pd.DataFrame:
     translator = Translator()
     data["content"] = data["content"].apply(lambda message: translator.translate(message, src=source_lang).text)    
+    return data
+
+def save_data(source_lang: str, conversation_name: str):
+    data = translate_data(load_all_messages(), source_lang)
+    data.to_parquet(os.path.join("preprocessed_data", f"{conversation_name}.gzip"), compression="gzip")
+
+# to be continued
+def load_data(conversation_name: str) -> pd.DataFrame:
+    data = pd.read_parquet(os.path.join("preprocessed_data", f"{conversation_name}.gzip"))
     return data
 
 # just for easier testing
@@ -64,5 +73,8 @@ def print_conversation(data):
 
         print(data.iloc[i]["content"])
 
-data = translate_data(load_all_messages().head(300), "pl")
-print_conversation(data)
+
+# template call of funcion that translates from PL -> ENG and saves that convo as parquet file in
+# preprocessed_data directory with the name "NS_KK.gzip"
+# PS this might take a while, my 176k messages conersation has estimated 24h processing time
+save_data("pl", "NS_KK")

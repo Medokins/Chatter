@@ -52,9 +52,9 @@ def translate_data(data: pd.DataFrame, source_lang: str) -> pd.DataFrame:
     data["content"] = data["content"].apply(lambda message: translator.translate(message, src=source_lang).text)    
     return data
 
-def save_data(source_lang: str, conversation_name: str):
-    data = translate_data(load_all_messages(), source_lang)
-    data.to_parquet(os.path.join("preprocessed_data", f"{conversation_name}.gzip"), compression="gzip")
+def save_data(source_lang: str, conversation_name: str, save_range):
+    data = translate_data(load_all_messages()[save_range[0]:save_range[1]], source_lang)
+    data.to_parquet(os.path.join("preprocessed_data", f"{conversation_name}_{save_range[0]}-{save_range[1]}.gzip"), compression="gzip")
 
 # to be continued
 def load_data(conversation_name: str) -> pd.DataFrame:
@@ -77,4 +77,12 @@ def print_conversation(data):
 # template call of funcion that translates from PL -> ENG and saves that convo as parquet file in
 # preprocessed_data directory with the name "NS_KK.gzip"
 # PS this might take a while, my 176k messages conersation has estimated 24h processing time
-save_data("pl", "NS_KK")
+
+# Due to unstable state of googletrans I'm training data in 500messages packages and will merge them all together in the end
+import time
+for i in range(0, len(load_all_messages()), 500):
+    save_data("pl", "NS_KK", [i, i + 500])
+    if i%1000 == 0:
+        # sleep to not surpass requests limit
+        time.sleep(60)
+        print(f"Sleeping at {i}")

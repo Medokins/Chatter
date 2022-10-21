@@ -5,6 +5,9 @@ import json
 import os
 from googletrans import Translator
 
+# use only when your data is not already in english
+translate = False
+
 def load_all_messages() -> pd.DataFrame:
     df = pd.DataFrame()
 
@@ -79,10 +82,11 @@ def print_conversation(data):
 # PS this might take a while, my 176k messages conersation has estimated 24h processing time
 
 # Due to unstable state of googletrans I'm training data in 500messages packages and will merge them all together in the end
-import time
-for i in range(0, len(load_all_messages()), 500):
-    save_data("pl", "NS_KK", [i, i + 500])
-    if i%1000 == 0:
-        # sleep to not surpass requests limit
-        time.sleep(60)
-        print(f"Sleeping at {i}")
+if translate:
+    import time
+    for i in range(0, len(load_all_messages()), 500):
+        save_data("pl", "NS_KK", [i, i + 500])
+        if i%1000 == 0:
+            # sleep to not surpass requests limit
+            time.sleep(30)
+            print(f"Sleeping at {i}")

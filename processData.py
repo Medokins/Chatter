@@ -5,10 +5,7 @@ import json
 import os
 from googletrans import Translator
 
-# use only when your data is not already in english
-translate = False
-
-def load_all_messages() -> pd.DataFrame:
+def load_all_messages() -> pd.DataFrame():
     df = pd.DataFrame()
 
     for i in np.arange(1, len(os.listdir("messages")) + 1) : 
@@ -50,20 +47,6 @@ def parse_obj(obj):
         pass
     return obj
 
-def translate_data(data: pd.DataFrame, source_lang: str) -> pd.DataFrame:
-    translator = Translator()
-    data["content"] = data["content"].apply(lambda message: translator.translate(message, src=source_lang).text)    
-    return data
-
-def save_data(source_lang: str, conversation_name: str, save_range):
-    data = translate_data(load_all_messages()[save_range[0]:save_range[1]], source_lang)
-    data.to_parquet(os.path.join("preprocessed_data", f"{conversation_name}_{save_range[0]}-{save_range[1]}.gzip"), compression="gzip")
-
-# to be continued
-def load_data(conversation_name: str) -> pd.DataFrame:
-    data = pd.read_parquet(os.path.join("preprocessed_data", f"{conversation_name}.gzip"))
-    return data
-
 # just for easier testing
 def print_conversation(data):
     section_flag = data.iloc[0]["is_sender"]
@@ -76,17 +59,58 @@ def print_conversation(data):
 
         print(data.iloc[i]["content"])
 
-
-# template call of funcion that translates from PL -> ENG and saves that convo as parquet file in
-# preprocessed_data directory with the name "NS_KK.gzip"
-# PS this might take a while, my 176k messages conersation has estimated 24h processing time
-
-# Due to unstable state of googletrans I'm training data in 500messages packages and will merge them all together in the end
-if translate:
+# use only if your data isn't already in english!
+# Due to unstable state of googletrans I recommend translating data in 500messages packages
+# and checking every now and then if it's till going, if not just paste last range value as satrt index in function call
+def translate(source_lang: str, conversation_name: str, iter_range: int, start_index = 0):
     import time
-    for i in range(0, len(load_all_messages()), 500):
-        save_data("pl", "NS_KK", [i, i + 500])
+    translator = Translator()
+
+    def translate_data(data: pd.DataFrame, source_lang: str):
+        data["content"] = data["content"].apply(lambda message: translator.translate(message, src=source_lang).text)    
+        return data
+
+    def save_cut_data(source_lang: str, conversation_name: str, iter_range):
+        data = translate_data(load_all_messages()[iter_range[0]:iter_range[1]], source_lang)
+        data.to_parquet(os.path.join("preprocessed_data", f"{conversation_name}_{iter_range[0]}-{iter_range[1]}.gzip"), compression="gzip")
+
+    for i in range(start_index, len(load_all_messages()), iter_range):
+        save_cut_data(source_lang, conversation_name, [i, i + 500])
         if i%1000 == 0:
             # sleep to not surpass requests limit
             time.sleep(30)
             print(f"Sleeping at {i}")
+
+# use only if You had translated Your data:
+def join_data(conversation_name):
+    from pathlib import Path
+    data_dir = Path("preprocessed_data")
+    if len([file for file in data_dir.glob('*.gzip')]) == 0:
+        print("there are no files in preprocessed_data directory! Translate data first (Use translate() function)")
+    else:
+        full_df = pd.concat(
+            pd.read_parquet(parquet_file)
+            for parquet_file in data_dir.glob('*.gzip')
+
+        full_df.to_parquet(os.path.join("full_conversations", f"{conversation_name}.parquet"))
+        # moving files to bin
+        for file in data_dir.glob('*.gzip'):
+            os.replace(file, os.path.join("bin", file.name))
+
+def save_data(conversation_name, translated = False):
+    if not translated:
+        data = load_all_messages()
+        data.to_parquet(os.path.join("full_conversations", f"{conversation_name}.parquet"))
+    else:
+        join_data(conversation_name)
+
+def load_data(conversation_name: str) -> pd.DataFrame():
+    data = pd.read_parquet(os.path.join("full_conversations", f"{conversation_name}.parquet"))
+    return data
+
+# sample call for save_data() function after processed_data is filled with translated cuts of conversation:
+# save_data("NS_KK_translated", translated=True)
+
+# sample call for save_data() function when Your conversation is already in english:
+# save_data("NS_KK_original")
+          

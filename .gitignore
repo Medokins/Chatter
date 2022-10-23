@@ -2,3 +2,4 @@ __pycache__/
 voice_samples/
 messages/
 preprocessed_data/
+bin/

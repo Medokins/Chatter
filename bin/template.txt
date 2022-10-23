@@ -1,0 +1,2 @@
+This directory exists as a backup if you wanted to retrieve data after merging it, if not just
+run clean.py file and it will delete all content of this directory (excluding this file)

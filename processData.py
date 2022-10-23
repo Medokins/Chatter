@@ -91,7 +91,7 @@ def join_data(conversation_name):
         full_df = pd.concat(
             pd.read_parquet(parquet_file)
             for parquet_file in data_dir.glob('*.gzip')
-
+        )
         full_df.to_parquet(os.path.join("full_conversations", f"{conversation_name}.parquet"))
         # moving files to bin
         for file in data_dir.glob('*.gzip'):

@@ -114,3 +114,6 @@ def load_data(conversation_name: str) -> pd.DataFrame():
 # sample call for save_data() function when Your conversation is already in english:
 # save_data("NS_KK_original")
           
+def fill_intents(conversation_name: str) -> None:
+    data = load_data(conversation_name)
+    pass
